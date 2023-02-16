@@ -12,7 +12,13 @@ const TasksList = () => {
 
   return (
     <ScrollView style={styles.scroll}>
-      {tasks === null ? <Text>Loading...</Text> : <Task />}
+      {tasks === null ? (
+        <Text>Loading...</Text>
+      ) : (
+        tasks.results.map((task, i) => {
+          return <Task key={i} content={task} />;
+        })
+      )}
     </ScrollView>
   );
 };

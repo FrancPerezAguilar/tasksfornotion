@@ -23,7 +23,10 @@ const Main = () => {
       </View>
       <View style={styles.divider}></View>
       <View style={styles.controllers}>
-        <Button title="New | +" onPress={() => getTaskList()} />
+        <Button
+          title="New | +"
+          onPress={() => getTaskList().then((res) => console.log(res))}
+        />
       </View>
       <TasksList />
     </SafeAreaView>

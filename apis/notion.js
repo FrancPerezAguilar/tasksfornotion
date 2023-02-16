@@ -16,6 +16,6 @@ export const getTaskList = async () => {
     const databaseId = '8954e5ccb5ed466daeec75dd67146408';
     const response = await notion.databases.query({
         database_id: databaseId,
-    })
+    });
     return response;
 }

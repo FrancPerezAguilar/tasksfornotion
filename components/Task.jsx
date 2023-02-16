@@ -1,10 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View, ScrollView } from "react-native";
 import Checkbox from "expo-checkbox";
 
-const Task = () => {
-  const [isChecked, setChecked] = useState(false);
+const Task = ({ content }) => {
+  const [checkbox, setCheckbox] = useState(false);
+  const [taskName, setTaskName] = useState(null);
+  const [date, setDate] = useState(null);
+  const [ltags, setLtags] = useState(null);
+
+  useEffect(() => {
+    setCheckbox(content.properties.Done.checkbox);
+    // Cuando llegue el contenido, asignarlo a los states correspondientes
+  }, []);
+
+  // crear un useEffect para cada uno de los conenidos de la tarea, i controlar sus
+  // eventos. Al tener un cambio, hacer un update a la API.
+  useEffect(() => {}, [checkbox]);
 
   return (
     <View style={styles.taskContainer}>
@@ -12,19 +24,29 @@ const Task = () => {
         <Checkbox
           color={"#2383E2"}
           style={styles.checkbox}
-          value={isChecked}
-          onValueChange={setChecked}
+          value={checkbox}
+          onValueChange={setCheckbox}
         />
-        <Text>My first task at Tasks for Notion!</Text>
+        <Text>{content.properties.Name.title[0].plain_text}</Text>
       </View>
       <View style={styles.bottomRow}>
-        <Text style={styles.dueDate}>Due date: 14/03/2023 14:30</Text>
+        <Text style={styles.dueDate}>{content.properties.Date.date.start}</Text>
         <ScrollView horizontal style={styles.tagsContainer}>
-          <Text style={styles.tag}>Work</Text>
-          <Text style={styles.tag}>Personal</Text>
-          <Text style={styles.tag}>Job</Text>
-          <Text style={styles.tag}>Urgent</Text>
-          <Text style={styles.tag}>Personal</Text>
+          {content.properties.Tags.multi_select.map((tag, i) => {
+            return (
+              <Text
+                key={i}
+                style={{
+                  backgroundColor: tag.color,
+                  marginHorizontal: 2,
+                  paddingHorizontal: 5,
+                  borderRadius: 5,
+                }}
+              >
+                {tag.name}
+              </Text>
+            );
+          })}
         </ScrollView>
       </View>
     </View>
@@ -71,7 +93,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   tag: {
-    backgroundColor: "#ffe6ba",
+    backgroundColor: "orange",
     marginHorizontal: 2,
     paddingHorizontal: 5,
     borderRadius: 5,
