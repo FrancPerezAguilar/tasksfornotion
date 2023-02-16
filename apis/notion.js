@@ -1,7 +1,8 @@
 const { Client } = require("@notionhq/client");
+const { NOTION_TOKEN } = require("../secrets");
 
 export const notion = new Client({
-    auth: 'secret_llXTIB6DvDDttnlA37IW0LIxZg4R2p0aLt4NJaZj5LV',
+    auth: NOTION_TOKEN,
 });
 
 
