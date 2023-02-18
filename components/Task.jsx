@@ -2,21 +2,39 @@ import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View, ScrollView } from "react-native";
 import Checkbox from "expo-checkbox";
+import { colorTags } from "../apis/colors";
+
+import { updateTask } from "../apis/notion";
 
 const Task = ({ content }) => {
+  const [id, setId] = useState(null);
   const [checkbox, setCheckbox] = useState(false);
   const [taskName, setTaskName] = useState(null);
   const [date, setDate] = useState(null);
   const [ltags, setLtags] = useState(null);
 
   useEffect(() => {
+    setId(content.id);
     setCheckbox(content.properties.Done.checkbox);
+    setTaskName(content.properties.Name.title[0].plain_text);
+    setDate(content.properties.Date.date);
+    setLtags(content.properties.Tags.multi_select);
     // Cuando llegue el contenido, asignarlo a los states correspondientes
   }, []);
 
   // crear un useEffect para cada uno de los conenidos de la tarea, i controlar sus
   // eventos. Al tener un cambio, hacer un update a la API.
-  useEffect(() => {}, [checkbox]);
+  useEffect(() => {
+    const payload = {
+      Done: {
+        checkbox: checkbox,
+      },
+    };
+    //updateTask(id, payload);
+  }, [checkbox]);
+  useEffect(() => {}, [taskName]);
+  useEffect(() => {}, [date]);
+  useEffect(() => {}, [ltags]);
 
   return (
     <View style={styles.taskContainer}>
@@ -27,26 +45,28 @@ const Task = ({ content }) => {
           value={checkbox}
           onValueChange={setCheckbox}
         />
-        <Text>{content.properties.Name.title[0].plain_text}</Text>
+        <Text>{taskName === null ? null : taskName}</Text>
       </View>
       <View style={styles.bottomRow}>
-        <Text style={styles.dueDate}>{content.properties.Date.date.start}</Text>
+        <Text style={styles.dueDate}>{date === null ? null : date.start}</Text>
         <ScrollView horizontal style={styles.tagsContainer}>
-          {content.properties.Tags.multi_select.map((tag, i) => {
-            return (
-              <Text
-                key={i}
-                style={{
-                  backgroundColor: tag.color,
-                  marginHorizontal: 2,
-                  paddingHorizontal: 5,
-                  borderRadius: 5,
-                }}
-              >
-                {tag.name}
-              </Text>
-            );
-          })}
+          {ltags === null
+            ? null
+            : ltags.map((tag, i) => {
+                return (
+                  <Text
+                    key={i}
+                    style={{
+                      backgroundColor: colorTags(tag.color),
+                      marginHorizontal: 2,
+                      paddingHorizontal: 5,
+                      borderRadius: 5,
+                    }}
+                  >
+                    {tag.name}
+                  </Text>
+                );
+              })}
         </ScrollView>
       </View>
     </View>
@@ -85,6 +105,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   dueDate: {
+    minWidth: "55%",
     color: "#920000",
   },
   tagsContainer: {

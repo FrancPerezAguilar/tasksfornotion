@@ -6,7 +6,7 @@ import { getContentDatabase, getTaskList } from "../apis/notion";
 
 import TasksList from "../components/TasksList";
 
-const Main = () => {
+const Main = ({ navigation }) => {
   const [database, setDatabase] = useState(null);
 
   useEffect(() => {
@@ -15,17 +15,14 @@ const Main = () => {
 
   return (
     <SafeAreaView>
-      <View style={styles.header}>
-        <Text style={{ fontSize: 25 }}>
-          {database === null ? "Loading..." : database.title[0].plain_text}
-        </Text>
-        <View style={styles.avatar} />
-      </View>
-      <View style={styles.divider}></View>
       <View style={styles.controllers}>
         <Button
           title="New | +"
-          onPress={() => getTaskList().then((res) => console.log(res))}
+          onPress={() =>
+            navigation.navigate("New task", {
+              db_title: database.title[0].plain_text,
+            })
+          }
         />
       </View>
       <TasksList />
@@ -64,3 +61,13 @@ const styles = StyleSheet.create({
 });
 
 export default Main;
+
+/*
+    <View style={styles.header}>
+        <Text style={{ fontSize: 25 }}>
+          {database === null ? "Loading..." : database.title[0].plain_text}
+        </Text>
+        <View style={styles.avatar} />
+      </View>
+    <View style={styles.divider}></View>
+*/
