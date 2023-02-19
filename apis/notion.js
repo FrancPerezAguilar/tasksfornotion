@@ -28,3 +28,39 @@ export const updateTask = async ( pageID, obj ) => {
     });
     return response;
 }
+
+export const createTask = async ( payload ) => {
+    const response = await notion.pages.create({
+        "parent": {
+            "type": "database_id",
+            "database_id": "8954e5ccb5ed466daeec75dd67146408"
+        },
+        "properties": {
+            "Done": {
+                "checkbox": false,
+            },
+            "Name": {
+                "title": [
+                    {
+                        "text": {
+                            "content": payload.name,
+                        }
+                    }
+                ]
+            },
+            "Tags": {
+                "multi_select": [
+                    {
+                      "id": payload.tagID,
+                    }
+                ],
+            },
+            "Date": {
+                "date": {
+                  "start": payload.date,
+                }
+            },
+        },
+    });
+    return response;
+}

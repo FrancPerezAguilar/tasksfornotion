@@ -9,6 +9,7 @@ import Onboard from './pages/Onboard';
 import NewTask from './pages/NewTask';
 
 import { getContentDatabase } from "./apis/notion";
+import TasksState from './contexts/TasksState';
 
 const Stack = createNativeStackNavigator();
 
@@ -29,14 +30,16 @@ export default function App() {
           <Stack.Screen name="Auth" component={Auth} />
         </Stack.Navigator>
         :
-        <Stack.Navigator>
-          <Stack.Group>
-            <Stack.Screen name={database === null ? "Loading..." : database.title[0].plain_text} component={Main} />
-          </Stack.Group>
-          <Stack.Group screenOptions={{ presentation: 'modal' }}>
-            <Stack.Screen name="New task" component={NewTask} />
-          </Stack.Group>
-        </Stack.Navigator>
+        <TasksState>
+          <Stack.Navigator>
+            <Stack.Group>
+              <Stack.Screen name={database === null ? "Loading..." : database.title[0].plain_text} component={Main} />
+            </Stack.Group>
+            <Stack.Group screenOptions={{ presentation: 'modal' }}>
+              <Stack.Screen name="New task" component={NewTask} />
+            </Stack.Group>
+          </Stack.Navigator>
+        </TasksState>
       }
     </NavigationContainer>
   );
