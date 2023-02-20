@@ -21,7 +21,6 @@ export const getTaskList = async () => {
 }
 
 export const updateTask = async ( pageID, obj ) => {
-
     const response = await notion.pages.update({
         page_id: pageID,
         properties: obj,

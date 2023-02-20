@@ -1,30 +1,61 @@
 import React, { useEffect, useState, useContext } from "react";
-import { Text, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
+import {
+  Text,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+  View,
+  TouchableHighlight,
+} from "react-native";
 import Task from "./Task";
 
 import TasksContext from "../contexts/TasksContext";
-import { getTaskList } from "../apis/notion";
+
 const TasksList = () => {
   const { taskList } = useContext(TasksContext);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    //console.log(taskList);
-    if (taskList !== undefined) {
+    if (taskList !== undefined && loading) {
       setLoading(false);
     }
   }, [taskList]);
 
   return (
-    <ScrollView style={styles.scroll}>
-      {!loading ? (
-        taskList.map((task, i) => {
-          return <Task key={i} content={task} />;
-        })
+    <>
+      {taskList.length !== 0 ? (
+        <>
+          <ScrollView style={styles.scroll}>
+            <Text style={styles.text}>Tasks</Text>
+            {!loading ? (
+              taskList.map((task, i) => {
+                if (task.properties.Done.checkbox) {
+                  return null;
+                }
+                return <Task key={i} content={task} />;
+              })
+            ) : (
+              <ActivityIndicator color="#2383E2" />
+            )}
+            <Text style={styles.text}>Completed</Text>
+            {!loading ? (
+              taskList.map((task, i) => {
+                if (!task.properties.Done.checkbox) {
+                  return null;
+                }
+                return <Task key={i} content={task} />;
+              })
+            ) : (
+              <ActivityIndicator color="#2383E2" />
+            )}
+          </ScrollView>
+        </>
       ) : (
-        <ActivityIndicator color="#2383E2" />
+        <View style={styles.noTasks}>
+          <Text>No tasks yet...</Text>
+        </View>
       )}
-    </ScrollView>
+    </>
   );
 };
 
@@ -32,6 +63,17 @@ const styles = StyleSheet.create({
   scroll: {
     paddingHorizontal: 16,
     marginVertical: 16,
+  },
+  noTasks: {
+    paddingHorizontal: 16,
+    marginVertical: 16,
+    display: "flex",
+    alignItems: "center",
+  },
+  text: {
+    textAlign: "left",
+    fontWeight: "700",
+    fontSize: 18,
   },
 });
 

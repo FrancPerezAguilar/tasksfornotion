@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   Text,
   StyleSheet,
@@ -17,9 +17,17 @@ import { Picker } from "@react-native-picker/picker";
 
 import { createTask } from "../apis/notion";
 import { colorTags } from "../apis/colors";
+import TasksContext from "../contexts/TasksContext";
 
-const NewTask = ({ route, navigation }) => {
-  const { db_title, db_tags } = route.params;
+const NewTask = ({ navigation }) => {
+  const { database, addTask } = useContext(TasksContext);
+  //const { db_title, db_tags } = route.params;
+  /**
+   * {
+                  db_title: database.title[0].plain_text,
+                  db_tags: database.properties.Tags.multi_select.options,
+                }
+   */
   const [taskName, setTaskName] = useState("");
   const [datetime, setDatetime] = useState(new Date(1598051730000));
   const [reminder, setReminder] = useState("NOT");
@@ -93,16 +101,19 @@ const NewTask = ({ route, navigation }) => {
                 selectedValue={tags}
                 onValueChange={(itemValue, itemIndex) => setTags(itemValue)}
               >
-                {db_tags.map((item, i) => {
-                  return (
-                    <Picker.Item
-                      key={i}
-                      label={item.name}
-                      value={item.id}
-                      style={{ backgroundColor: colorTags(item.color) }}
-                    />
-                  );
-                })}
+                {database.properties.Tags.multi_select.options.map(
+                  (item, i) => {
+                    return (
+                      <Picker.Item
+                        key={i}
+                        label={item.name}
+                        value={item.id}
+                        style={{ backgroundColor: colorTags(item.color) }}
+                        enabled={i === 0}
+                      />
+                    );
+                  }
+                )}
               </Picker>
             </View>
             <View style={styles.commit}>
@@ -111,7 +122,7 @@ const NewTask = ({ route, navigation }) => {
                 style={styles.commitButton}
                 onPress={() => {
                   setLoading(true);
-                  createTask({
+                  addTask({
                     name: taskName,
                     date: datetime.toISOString(),
                     tagID: tags,

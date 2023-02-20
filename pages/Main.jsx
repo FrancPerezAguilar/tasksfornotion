@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from "react";
-import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
   Text,
@@ -7,38 +6,18 @@ import {
   Button,
   ActivityIndicator,
 } from "react-native";
-import { getContentDatabase, getTaskList } from "../apis/notion";
 
 import TasksList from "../components/TasksList";
 import TasksContext from "../contexts/TasksContext";
 
 const Main = ({ navigation }) => {
-  const { taskList, database, initialQuery } = useContext(TasksContext);
-
-  //const [database, setDatabase] = useState(null);
-  //const [tasks, setTasks] = useState(null);
+  const { initialQuery } = useContext(TasksContext);
 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    //getContentDatabase().then((res) => setDatabase(res));
-    /*
-    getTaskList().then((res) => {
-      setTasks(res);
-      setLoading(false);
-    });
-    console.log(taskList);
-    */
     initialQuery();
   }, []);
-
-  /*
-  useEffect(() => {
-    if (taskList !== null && loading) {
-      setLoading(false);
-    }
-  }, [taskList]);
-  */
 
   useEffect(() => {
     navigation.addListener("focus", () => {
@@ -57,12 +36,7 @@ const Main = ({ navigation }) => {
           <View style={styles.controllers}>
             <Button
               title="New | +"
-              onPress={() =>
-                navigation.navigate("New task", {
-                  db_title: database.title[0].plain_text,
-                  db_tags: database.properties.Tags.multi_select.options,
-                })
-              }
+              onPress={() => navigation.navigate("New task")}
             />
           </View>
           <TasksList />

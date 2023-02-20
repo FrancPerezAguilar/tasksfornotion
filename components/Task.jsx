@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View, ScrollView, Pressable } from "react-native";
 import Checkbox from "expo-checkbox";
 import { colorTags } from "../apis/colors";
 
-import { updateTask } from "../apis/notion";
+import TasksContext from "../contexts/TasksContext";
 
 const Task = ({ content }) => {
+  const { patchTask } = useContext(TasksContext);
   const [id, setId] = useState(null);
   const [checkbox, setCheckbox] = useState(false);
   const [taskName, setTaskName] = useState(null);
@@ -17,21 +18,12 @@ const Task = ({ content }) => {
     setId(content.id);
     setCheckbox(content.properties.Done.checkbox);
     setTaskName(content.properties.Name.title[0].plain_text);
-    setDate(content.properties.Date.date);
+    setDate(new Date(content.properties.Date.date.start).toLocaleString());
     setLtags(content.properties.Tags.multi_select);
     // Cuando llegue el contenido, asignarlo a los states correspondientes
   }, []);
 
-  // crear un useEffect para cada uno de los conenidos de la tarea, i controlar sus
-  // eventos. Al tener un cambio, hacer un update a la API.
-  useEffect(() => {
-    const payload = {
-      Done: {
-        checkbox: checkbox,
-      },
-    };
-    //updateTask(id, payload);
-  }, [checkbox]);
+  useEffect(() => {}, [checkbox]);
   useEffect(() => {}, [taskName]);
   useEffect(() => {}, [date]);
   useEffect(() => {}, [ltags]);
@@ -43,12 +35,19 @@ const Task = ({ content }) => {
           color={"#2383E2"}
           style={styles.checkbox}
           value={checkbox}
-          onValueChange={setCheckbox}
+          onValueChange={() => {
+            setCheckbox(!checkbox);
+            patchTask(id, {
+              Done: {
+                checkbox: !checkbox,
+              },
+            });
+          }}
         />
         <Text>{taskName === null ? null : taskName}</Text>
       </View>
       <View style={styles.bottomRow}>
-        <Text style={styles.dueDate}>{date === null ? null : date.start}</Text>
+        <Text style={styles.dueDate}>{date === null ? null : date}</Text>
         <ScrollView horizontal style={styles.tagsContainer}>
           {ltags === null
             ? null
@@ -75,7 +74,7 @@ const Task = ({ content }) => {
 
 const styles = StyleSheet.create({
   taskContainer: {
-    marginBottom: 10,
+    marginVertical: 5,
     //height: 90,
     //width: "90%",
     display: "flex",

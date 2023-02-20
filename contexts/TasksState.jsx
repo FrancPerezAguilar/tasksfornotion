@@ -2,40 +2,61 @@ import React, { useReducer, useEffect } from "react";
 import TasksReducer from "./TasksReducer";
 import TasksContext from "./TasksContext";
 
-import { getContentDatabase, getTaskList } from "../apis/notion";
+import {
+  getContentDatabase,
+  getTaskList,
+  createTask,
+  updateTask,
+} from "../apis/notion";
 
-import { ADD_TASK, INIT } from "./types";
+import { ADD_TASK, INIT, PACTH_TASK, RELOAD_TASKS } from "./types";
 
 const TasksState = (props) => {
   const initialState = {
     taskList: [],
-    database: getContentDatabase(),
+    database: {},
   };
 
   const [state, dispatch] = useReducer(TasksReducer, initialState);
 
-  useEffect(() => {
-    //initialQuery();
-  }, []);
-
-  useEffect(() => {
-    //console.log(state.taskList);
-  });
-
   const initialQuery = async () => {
-    const response = getTaskList();
+    const response_tasks = getTaskList();
+    const response_db = getContentDatabase();
     dispatch({
       type: INIT,
-      payload: (await response).results,
+      payload: {
+        tasks: (await response_tasks).results,
+        database: await response_db,
+      },
     });
   };
 
-  const addTask = (payload) => {
-    var array = state.taskList;
-    array.push(payload);
+  const reloadTasks = async () => {
+    const response_tasks = getTaskList();
     dispatch({
-      type: ADD_TASK,
-      payload: array,
+      type: RELOAD_TASKS,
+      payload: (await response_tasks).results,
+    });
+    return response_tasks;
+  };
+
+  const addTask = async (payload) => {
+    await createTask(payload).then((res) => {
+      var array = state.taskList;
+      array = [res, ...array];
+      dispatch({
+        type: ADD_TASK,
+        payload: array,
+      });
+      return res;
+    });
+  };
+
+  const patchTask = async (pageID, obj) => {
+    updateTask(pageID, obj).then((res) => {
+      reloadTasks().then(() => {
+        return res;
+      });
     });
   };
 
@@ -45,6 +66,7 @@ const TasksState = (props) => {
         taskList: state.taskList,
         database: state.database,
         addTask,
+        patchTask,
         initialQuery,
       }}
     >
