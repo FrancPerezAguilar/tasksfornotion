@@ -6,6 +6,7 @@ import {
   Button,
   ActivityIndicator,
 } from "react-native";
+import { FAB } from "@rneui/themed";
 
 import TasksList from "../components/TasksList";
 import TasksContext from "../contexts/TasksContext";
@@ -33,13 +34,15 @@ const Main = ({ navigation }) => {
     <>
       {!loading ? (
         <>
-          <View style={styles.controllers}>
-            <Button
-              title="New | +"
-              onPress={() => navigation.navigate("New task")}
-            />
-          </View>
           <TasksList />
+          <FAB
+            icon={{ name: "add", color: "white" }}
+            color="#2383E2"
+            placement="right"
+            style={styles.fab}
+            title="New task"
+            onPress={() => navigation.navigate("New task")}
+          />
         </>
       ) : (
         <View style={styles.loading}>
@@ -75,13 +78,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#3C3C3C",
     marginHorizontal: 16,
   },
-  controllers: {
-    marginTop: 16,
-    paddingHorizontal: 16,
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "center",
+  fab: {
+    marginBottom: "10%",
   },
 });
 

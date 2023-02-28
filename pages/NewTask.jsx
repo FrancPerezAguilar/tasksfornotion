@@ -21,13 +21,6 @@ import TasksContext from "../contexts/TasksContext";
 
 const NewTask = ({ navigation }) => {
   const { database, addTask } = useContext(TasksContext);
-  //const { db_title, db_tags } = route.params;
-  /**
-   * {
-                  db_title: database.title[0].plain_text,
-                  db_tags: database.properties.Tags.multi_select.options,
-                }
-   */
   const [taskName, setTaskName] = useState("");
   const [datetime, setDatetime] = useState(new Date(1598051730000));
   const [reminder, setReminder] = useState("NOT");

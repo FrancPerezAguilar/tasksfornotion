@@ -1,19 +1,20 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useCallback } from "react";
 import {
   Text,
   StyleSheet,
   ScrollView,
   ActivityIndicator,
   View,
-  TouchableHighlight,
+  RefreshControl,
 } from "react-native";
 import Task from "./Task";
 
 import TasksContext from "../contexts/TasksContext";
 
 const TasksList = () => {
-  const { taskList } = useContext(TasksContext);
+  const { taskList, reloadTasks } = useContext(TasksContext);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     if (taskList !== undefined && loading) {
@@ -21,11 +22,21 @@ const TasksList = () => {
     }
   }, [taskList]);
 
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    reloadTasks().then((res) => setRefreshing(false));
+  }, []);
+
   return (
     <>
       {taskList.length !== 0 ? (
         <>
-          <ScrollView style={styles.scroll}>
+          <ScrollView
+            style={styles.scroll}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+          >
             <Text style={styles.text}>Tasks</Text>
             {!loading ? (
               taskList.map((task, i) => {

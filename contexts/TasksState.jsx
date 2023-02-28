@@ -32,10 +32,12 @@ const TasksState = (props) => {
   };
 
   const reloadTasks = async () => {
-    const response_tasks = getTaskList();
-    dispatch({
-      type: RELOAD_TASKS,
-      payload: (await response_tasks).results,
+    const response_tasks = getTaskList().then((res) => {
+      dispatch({
+        type: RELOAD_TASKS,
+        payload: res.results,
+      });
+      return res;
     });
     return response_tasks;
   };
@@ -68,6 +70,7 @@ const TasksState = (props) => {
         addTask,
         patchTask,
         initialQuery,
+        reloadTasks,
       }}
     >
       {props.children}
