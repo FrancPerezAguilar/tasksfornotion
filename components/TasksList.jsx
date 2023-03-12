@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   View,
   RefreshControl,
+  Image,
 } from "react-native";
 import Task from "./Task";
 
@@ -28,45 +29,36 @@ const TasksList = () => {
   }, []);
 
   return (
-    <>
+    <ScrollView
+      style={styles.scroll}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       {taskList.length !== 0 ? (
         <>
-          <ScrollView
-            style={styles.scroll}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-          >
-            <Text style={styles.text}>Tasks</Text>
-            {!loading ? (
-              taskList.map((task, i) => {
-                if (task.properties.Done.checkbox) {
-                  return null;
-                }
-                return <Task key={i} content={task} />;
-              })
-            ) : (
-              <ActivityIndicator color="#2383E2" />
-            )}
-            <Text style={styles.text}>Completed</Text>
-            {!loading ? (
-              taskList.map((task, i) => {
-                if (!task.properties.Done.checkbox) {
-                  return null;
-                }
-                return <Task key={i} content={task} />;
-              })
-            ) : (
-              <ActivityIndicator color="#2383E2" />
-            )}
-          </ScrollView>
+          <Text style={styles.text}>Tasks</Text>
+          {!loading ? (
+            taskList.map((task, i) => {
+              return <Task key={i} content={task} />;
+            })
+          ) : (
+            <ActivityIndicator
+              color="#2383E2"
+              style={styles.activityIndicator}
+            />
+          )}
         </>
       ) : (
         <View style={styles.noTasks}>
-          <Text>No tasks yet...</Text>
+          <Image
+            style={styles.image}
+            source={require("../assets/no-tasks.png")}
+          />
+          <Text>That's it!</Text>
         </View>
       )}
-    </>
+    </ScrollView>
   );
 };
 
@@ -85,6 +77,13 @@ const styles = StyleSheet.create({
     textAlign: "left",
     fontWeight: "700",
     fontSize: 18,
+  },
+  image: {
+    width: 250,
+    height: 250,
+  },
+  activityIndicator: {
+    paddingVertical: 25,
   },
 });
 

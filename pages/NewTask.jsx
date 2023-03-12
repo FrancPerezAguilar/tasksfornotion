@@ -14,17 +14,25 @@ import {
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-picker/picker";
+import { Dialog, Overlay, Icon } from "@rneui/themed";
+import SelectBox from "react-native-multi-selectbox";
+import { xorBy } from "lodash";
 
 import { createTask } from "../apis/notion";
 import { colorTags } from "../apis/colors";
 import TasksContext from "../contexts/TasksContext";
 
 const NewTask = ({ navigation }) => {
+  const TAG_OPTIONS = [];
   const { database, addTask } = useContext(TasksContext);
   const [taskName, setTaskName] = useState("");
   const [datetime, setDatetime] = useState(new Date(1598051730000));
   const [reminder, setReminder] = useState("NOT");
-  const [tags, setTags] = useState(null);
+  const [tags, setTags] = useState("");
+  const [dtvisible, setDTvisible] = useState(false);
+  const [remindervisible, setRemindervisible] = useState(false);
+  const [tagsvisible, setTagsvisible] = useState(false);
+  const [selectedTags, setSelectedTags] = useState([]);
 
   const [loading, setLoading] = useState(false);
 
@@ -33,6 +41,31 @@ const NewTask = ({ navigation }) => {
     //setShow(false);
     setDatetime(currentDate);
   };
+
+  const toggleDTOverlay = () => {
+    setDTvisible(!dtvisible);
+  };
+
+  const toggleReminderOverlay = () => {
+    setRemindervisible(!remindervisible);
+  };
+
+  const toggleTagsOverlay = () => {
+    setTagsvisible(!tagsvisible);
+  };
+
+  function onMultiChange() {
+    return (item) => setSelectedTags(xorBy(selectedTags, [item], "id"));
+  }
+
+  useEffect(() => {
+    database.properties.Tags.multi_select.options.map((item, i) => {
+      TAG_OPTIONS.push({
+        item: item.name,
+        id: item.id,
+      });
+    });
+  }, []);
 
   return (
     <>
@@ -48,67 +81,32 @@ const NewTask = ({ navigation }) => {
               value={taskName}
               placeholder="New task"
               multiline
-              numberOfLines={4}
+              numberOfLines={5}
             />
-            <TouchableHighlight style={styles.datePicker}>
-              {Platform.OS === "ios" ? (
-                <View style={styles.datePickerViewiOS}>
-                  <Text>Set due date and time</Text>
-                  <DateTimePicker
-                    testID="datePicker"
-                    value={datetime}
-                    mode={"date"}
-                    onChange={onChange}
-                  />
-                  <DateTimePicker
-                    testID="timePicker"
-                    value={datetime}
-                    mode={"time"}
-                    is24Hour={true}
-                    onChange={onChange}
-                  />
-                </View>
-              ) : (
-                <Text>{datetime.toLocaleString()}</Text>
-              )}
-            </TouchableHighlight>
-            <Text>{datetime.toISOString()}</Text>
-            <View style={styles.picker}>
-              <Text>Set a reminder</Text>
-              <Picker
-                selectedValue={reminder}
-                onValueChange={(itemValue, itemIndex) => setReminder(itemValue)}
-              >
-                <Picker.Item label="No reminder" value="NOT" enabled />
-                <Picker.Item label="On due date" value="0" />
-                <Picker.Item label="5min before" value="5m" />
-                <Picker.Item label="1h before" value="1h" />
-                <Picker.Item label="2h before" value="2h" />
-                <Picker.Item label="1 day before" value="1d" />
-                <Picker.Item label="2 day before" value="2d" />
-              </Picker>
+            <View style={styles.buttonRow}>
+              <Icon
+                raised
+                name="event"
+                type="material"
+                color="#2383E2"
+                onPress={toggleDTOverlay}
+              />
+              <Icon
+                raised
+                name="notifications"
+                type="material"
+                color="#2383E2"
+                onPress={toggleReminderOverlay}
+              />
+              <Icon
+                raised
+                name="label"
+                type="material"
+                color="#2383E2"
+                onPress={toggleTagsOverlay}
+              />
             </View>
-            <View style={styles.tags}>
-              <Text>Set a reminder</Text>
-              <Picker
-                selectedValue={tags}
-                onValueChange={(itemValue, itemIndex) => setTags(itemValue)}
-              >
-                {database.properties.Tags.multi_select.options.map(
-                  (item, i) => {
-                    return (
-                      <Picker.Item
-                        key={i}
-                        label={item.name}
-                        value={item.id}
-                        style={{ backgroundColor: colorTags(item.color) }}
-                        enabled={i === 0}
-                      />
-                    );
-                  }
-                )}
-              </Picker>
-            </View>
+
             <View style={styles.commit}>
               <Button
                 title="Create task"
@@ -134,6 +132,73 @@ const NewTask = ({ navigation }) => {
               />
             </View>
           </KeyboardAvoidingView>
+
+          <Overlay
+            style={styles.overlay}
+            isVisible={dtvisible}
+            onBackdropPress={toggleDTOverlay}
+          >
+            <View style={styles.datePickerViewiOS}>
+              <Text>Date and Time</Text>
+              <DateTimePicker
+                testID="datePicker"
+                value={datetime}
+                mode={"date"}
+                onChange={onChange}
+              />
+              <DateTimePicker
+                testID="timePicker"
+                value={datetime}
+                mode={"time"}
+                is24Hour={true}
+                onChange={onChange}
+              />
+            </View>
+          </Overlay>
+          <Overlay
+            style={styles.overlay}
+            isVisible={remindervisible}
+            onBackdropPress={toggleReminderOverlay}
+          >
+            <View style={styles.picker}>
+              <Picker
+                selectedValue={reminder}
+                onValueChange={(itemValue, itemIndex) => setReminder(itemValue)}
+              >
+                <Picker.Item label="No reminder" value="NOT" enabled />
+                <Picker.Item label="On due date" value="0" />
+                <Picker.Item label="5min before" value="5m" />
+                <Picker.Item label="1h before" value="1h" />
+                <Picker.Item label="2h before" value="2h" />
+                <Picker.Item label="1 day before" value="1d" />
+                <Picker.Item label="2 day before" value="2d" />
+              </Picker>
+            </View>
+          </Overlay>
+          <Overlay
+            style={styles.overlay}
+            isVisible={tagsvisible}
+            onBackdropPress={toggleTagsOverlay}
+          >
+            <View
+              style={{
+                width: 300,
+              }}
+            >
+              <SelectBox
+                label="Tags"
+                arrowIconColor={"#2383E2"}
+                searchIconColor={"#2383E2"}
+                toggleIconColor={"#2383E2"}
+                multiOptionContainerStyle={{ backgroundColor: "#2383E2" }}
+                options={TAG_OPTIONS}
+                selectedValues={selectedTags}
+                onMultiSelect={onMultiChange()}
+                onTapClose={onMultiChange()}
+                isMulti
+              />
+            </View>
+          </Overlay>
         </ScrollView>
       ) : (
         <View style={styles.loading}>
@@ -156,6 +221,7 @@ const styles = StyleSheet.create({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    paddingTop: 25,
   },
   input: {
     marginVertical: 5,
@@ -163,8 +229,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderWidth: 2,
     borderRadius: 10,
+    height: 100,
     width: "90%",
     borderColor: "#2383E2",
+  },
+  buttonRow: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+  },
+  overlay: {
+    width: "90%",
   },
   datePicker: {
     marginVertical: 5,
@@ -184,9 +259,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     paddingVertical: 5,
     paddingHorizontal: 10,
-    borderWidth: 2,
-    borderRadius: 10,
-    width: "90%",
+    width: 250,
   },
   tags: {
     marginVertical: 5,

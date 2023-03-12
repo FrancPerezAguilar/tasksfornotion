@@ -46,7 +46,7 @@ const Main = ({ navigation }) => {
         </>
       ) : (
         <View style={styles.loading}>
-          <ActivityIndicator />
+          <ActivityIndicator style={styles.activityIndicator} size={"large"} />
         </View>
       )}
     </>
@@ -80,6 +80,9 @@ const styles = StyleSheet.create({
   },
   fab: {
     marginBottom: "10%",
+  },
+  activityIndicator: {
+    paddingVertical: 25,
   },
 });
 

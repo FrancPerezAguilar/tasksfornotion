@@ -56,9 +56,12 @@ const TasksState = (props) => {
 
   const patchTask = async (pageID, obj) => {
     updateTask(pageID, obj).then((res) => {
-      reloadTasks().then(() => {
+      /**
+       * reloadTasks().then(() => {
         return res;
       });
+       */
+      return res;
     });
   };
 
