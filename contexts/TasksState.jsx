@@ -65,6 +65,10 @@ const TasksState = (props) => {
     });
   };
 
+  const getTags = () => {
+    return state.database.properties.Tags.multi_select.options;
+  };
+
   return (
     <TasksContext.Provider
       value={{
@@ -74,6 +78,7 @@ const TasksState = (props) => {
         patchTask,
         initialQuery,
         reloadTasks,
+        getTags,
       }}
     >
       {props.children}

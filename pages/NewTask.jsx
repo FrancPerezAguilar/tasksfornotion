@@ -6,7 +6,6 @@ import {
   Button,
   TextInput,
   KeyboardAvoidingView,
-  TouchableHighlight,
   Platform,
   ScrollView,
   ActivityIndicator,
@@ -14,31 +13,24 @@ import {
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-picker/picker";
-import { Dialog, Overlay, Icon } from "@rneui/themed";
-import SelectBox from "react-native-multi-selectbox";
-import { xorBy } from "lodash";
+import { Overlay, Icon } from "@rneui/themed";
 
-import { createTask } from "../apis/notion";
-import { colorTags } from "../apis/colors";
+import Multiselect from "../components/Multiselect";
 import TasksContext from "../contexts/TasksContext";
 
 const NewTask = ({ navigation }) => {
-  const TAG_OPTIONS = [];
-  const { database, addTask } = useContext(TasksContext);
+  const { addTask } = useContext(TasksContext);
+  const [loading, setLoading] = useState(false);
   const [taskName, setTaskName] = useState("");
   const [datetime, setDatetime] = useState(new Date(1598051730000));
   const [reminder, setReminder] = useState("NOT");
-  const [tags, setTags] = useState("");
+  const [selected, setSelected] = React.useState(new Map());
   const [dtvisible, setDTvisible] = useState(false);
   const [remindervisible, setRemindervisible] = useState(false);
   const [tagsvisible, setTagsvisible] = useState(false);
-  const [selectedTags, setSelectedTags] = useState([]);
-
-  const [loading, setLoading] = useState(false);
 
   const onChange = (event, selectedDate) => {
     const currentDate = selectedDate;
-    //setShow(false);
     setDatetime(currentDate);
   };
 
@@ -54,18 +46,15 @@ const NewTask = ({ navigation }) => {
     setTagsvisible(!tagsvisible);
   };
 
-  function onMultiChange() {
-    return (item) => setSelectedTags(xorBy(selectedTags, [item], "id"));
-  }
-
-  useEffect(() => {
-    database.properties.Tags.multi_select.options.map((item, i) => {
-      TAG_OPTIONS.push({
-        item: item.name,
-        id: item.id,
+  const getTagsArrayFromMap = () => {
+    var arr = [];
+    selected.forEach((values, id) => {
+      arr.push({
+        id: id,
       });
     });
-  }, []);
+    return arr;
+  };
 
   return (
     <>
@@ -116,12 +105,10 @@ const NewTask = ({ navigation }) => {
                   addTask({
                     name: taskName,
                     date: datetime.toISOString(),
-                    tagID: tags,
+                    tagID: getTagsArrayFromMap(),
                   }).then((res) => {
                     if (res !== null) {
-                      setTimeout(() => {
-                        navigation.goBack();
-                      }, 3000);
+                      navigation.goBack();
                     }
                     if (res === null) {
                       setLoading(false);
@@ -180,24 +167,7 @@ const NewTask = ({ navigation }) => {
             isVisible={tagsvisible}
             onBackdropPress={toggleTagsOverlay}
           >
-            <View
-              style={{
-                width: 300,
-              }}
-            >
-              <SelectBox
-                label="Tags"
-                arrowIconColor={"#2383E2"}
-                searchIconColor={"#2383E2"}
-                toggleIconColor={"#2383E2"}
-                multiOptionContainerStyle={{ backgroundColor: "#2383E2" }}
-                options={TAG_OPTIONS}
-                selectedValues={selectedTags}
-                onMultiSelect={onMultiChange()}
-                onTapClose={onMultiChange()}
-                isMulti
-              />
-            </View>
+            <Multiselect selected={selected} setSelected={setSelected} />
           </Overlay>
         </ScrollView>
       ) : (

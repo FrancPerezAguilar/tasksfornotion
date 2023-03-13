@@ -15,6 +15,12 @@ export const colorTags = (color) => {
         case "purple":
             return "#e8deee";
 
+        case "gray":
+            return "#e3e2e0";
+
+        case "brown":
+            return "#eee0da";
+
         default:
             return "#3c3c3c";
     }

@@ -55,11 +55,7 @@ export const createTask = async ( payload ) => {
                 ]
             },
             "Tags": {
-                "multi_select": [
-                    {
-                      "id": payload.tagID,
-                    }
-                ],
+                "multi_select": payload.tagID,
             },
             "Date": {
                 "date": {

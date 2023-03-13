@@ -1,8 +1,17 @@
 import React, { useEffect, useState, useContext } from "react";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, ScrollView, Pressable } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  Pressable,
+  Alert,
+  TouchableOpacity,
+} from "react-native";
 import Checkbox from "expo-checkbox";
 import { colorTags } from "../apis/colors";
+import { Icon } from "@rneui/themed";
 
 import TasksContext from "../contexts/TasksContext";
 
@@ -67,6 +76,20 @@ const Task = ({ content }) => {
                 );
               })}
         </ScrollView>
+        <Icon
+          name="menu"
+          type="material"
+          color="#2383E2"
+          onPress={() =>
+            Alert.alert("Delete task", "Are you sure?", [
+              {
+                text: "Cancel",
+                style: "cancel",
+              },
+              { text: "OK", onPress: () => console.log("OK Pressed") },
+            ])
+          }
+        />
       </View>
     </View>
   );
@@ -75,14 +98,15 @@ const Task = ({ content }) => {
 const styles = StyleSheet.create({
   taskContainer: {
     marginVertical: 5,
-    //height: 90,
-    //width: "90%",
     display: "flex",
-    borderWidth: 2,
-    borderColor: "#3C3C3C",
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#fff",
+    shadowColor: "rgba(0,0,0, .4)", // IOS
+    shadowOffset: { height: 1, width: 0 }, // IOS
+    shadowOpacity: 1, // IOS
+    shadowRadius: 1, //IOS
   },
   topRow: {
     marginTop: 10,

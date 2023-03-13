@@ -55,7 +55,6 @@ const TasksList = () => {
             style={styles.image}
             source={require("../assets/no-tasks.png")}
           />
-          <Text>That's it!</Text>
         </View>
       )}
     </ScrollView>
