@@ -19,6 +19,7 @@ function Item({ id, title, color, selected, onSelect }) {
         styles.item,
         { backgroundColor: colorTags(color) },
         { borderWidth: selected ? 1.5 : 0 },
+        { borderColor: selected ? color : null },
       ]}
     >
       <Text style={styles.title}>{title}</Text>
