@@ -25,6 +25,7 @@ const TasksList = () => {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
+    console.log("refrescando");
     reloadTasks().then((res) => setRefreshing(false));
   }, []);
 

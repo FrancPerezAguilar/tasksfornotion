@@ -19,14 +19,16 @@ const Task = ({ content }) => {
   const { patchTask } = useContext(TasksContext);
   const [id, setId] = useState(null);
   const [checkbox, setCheckbox] = useState(false);
-  const [taskName, setTaskName] = useState(null);
+  const [taskName, setTaskName] = useState("");
   const [date, setDate] = useState(null);
   const [ltags, setLtags] = useState(null);
 
   useEffect(() => {
     setId(content.id);
     setCheckbox(content.properties.Done.checkbox);
-    setTaskName(content.properties.Name.title[0].plain_text);
+    if (content.properties.Name.title[0] !== undefined) {
+      setTaskName(content.properties.Name.title[0].plain_text);
+    }
     setDate(new Date(content.properties.Date.date.start).toLocaleString());
     setLtags(content.properties.Tags.multi_select);
     // Cuando llegue el contenido, asignarlo a los states correspondientes
@@ -62,34 +64,23 @@ const Task = ({ content }) => {
             ? null
             : ltags.map((tag, i) => {
                 return (
-                  <Text
+                  <View
                     key={i}
                     style={{
                       backgroundColor: colorTags(tag.color),
+                      marginVertical: 5,
                       marginHorizontal: 2,
-                      paddingHorizontal: 5,
+                      paddingHorizontal: 8,
+                      paddingVertical: 2,
                       borderRadius: 5,
+                      width: "auto",
                     }}
                   >
-                    {tag.name}
-                  </Text>
+                    <Text>{tag.name === null ? "" : tag.name}</Text>
+                  </View>
                 );
               })}
         </ScrollView>
-        <Icon
-          name="menu"
-          type="material"
-          color="#2383E2"
-          onPress={() =>
-            Alert.alert("Delete task", "Are you sure?", [
-              {
-                text: "Cancel",
-                style: "cancel",
-              },
-              { text: "OK", onPress: () => console.log("OK Pressed") },
-            ])
-          }
-        />
       </View>
     </View>
   );
@@ -114,6 +105,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "flex-start",
     marginBottom: 10,
   },
   bottomRow: {
@@ -135,12 +127,6 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     marginLeft: 10,
-  },
-  tag: {
-    backgroundColor: "orange",
-    marginHorizontal: 2,
-    paddingHorizontal: 5,
-    borderRadius: 5,
   },
 });
 

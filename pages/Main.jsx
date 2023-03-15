@@ -7,7 +7,9 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { FAB } from "@rneui/themed";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
+import NewTaskModal from "../components/NewTaskModal";
 import TasksList from "../components/TasksList";
 import TasksContext from "../contexts/TasksContext";
 
@@ -33,7 +35,9 @@ const Main = ({ navigation }) => {
   return (
     <>
       {!loading ? (
-        <>
+        <GestureHandlerRootView style={{ height: "100%", width: "100%" }}>
+          <NewTaskModal />
+
           <TasksList />
           <FAB
             icon={{ name: "add", color: "white" }}
@@ -43,7 +47,16 @@ const Main = ({ navigation }) => {
             title="New task"
             onPress={() => navigation.navigate("New task")}
           />
-        </>
+          <FAB
+            visible={false}
+            icon={{ name: "edit", color: "gray" }}
+            color="#e2e2e2"
+            placement="left"
+            style={styles.fab2}
+            title="Edit tasks"
+            onPress={() => {}}
+          />
+        </GestureHandlerRootView>
       ) : (
         <View style={styles.loading}>
           <ActivityIndicator style={styles.activityIndicator} size={"large"} />
@@ -79,6 +92,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   fab: {
+    marginBottom: "10%",
+    shadowColor: "rgba(35, 131, 226, .4)", // IOS
+    shadowOffset: { height: 2, width: 0 }, // IOS
+    shadowOpacity: 1, // IOS
+    shadowRadius: 1, //IOS
+  },
+  fab2: {
     marginBottom: "10%",
   },
   activityIndicator: {

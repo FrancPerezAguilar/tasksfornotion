@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "tasksfornotion",
+    "name": "Tasks for Notion",
     "slug": "tasksfornotion",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -14,11 +14,9 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false
     },
     "android": {
       "adaptiveIcon": {
@@ -27,7 +25,7 @@
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon_1.png"
     }
   }
 }

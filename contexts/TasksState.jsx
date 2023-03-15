@@ -32,25 +32,24 @@ const TasksState = (props) => {
   };
 
   const reloadTasks = async () => {
-    const response_tasks = getTaskList().then((res) => {
+    return await getTaskList().then((res) => {
       dispatch({
         type: RELOAD_TASKS,
         payload: res.results,
       });
       return res;
     });
-    return response_tasks;
   };
 
   const addTask = async (payload) => {
     await createTask(payload).then((res) => {
-      var array = state.taskList;
-      array = [res, ...array];
-      dispatch({
-        type: ADD_TASK,
-        payload: array,
+      return getTaskList().then((res) => {
+        dispatch({
+          type: ADD_TASK,
+          payload: res.results,
+        });
+        return res;
       });
-      return res;
     });
   };
 
@@ -67,6 +66,10 @@ const TasksState = (props) => {
 
   const getTags = () => {
     return state.database.properties.Tags.multi_select.options;
+  };
+
+  const getReminders = () => {
+    return null;
   };
 
   return (

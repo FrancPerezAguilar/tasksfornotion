@@ -15,7 +15,6 @@ export default function (state, action) {
         ...state,
         taskList: payload.tasks,
         database: payload.database,
-        db_tags: payload.db_tags,
       };
 
     case PACTH_TASK:
