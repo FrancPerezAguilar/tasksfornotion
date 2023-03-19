@@ -19,11 +19,11 @@ export default function App() {
   return (
     <NavigationContainer>
       {
-        token !== null ?
+        token === null ?
         <>
         <StatusBar backgroundColor="#ffffff" barStyle={'dark-content'}/>
         <Stack.Navigator>
-          <Stack.Screen name='Onboard' component={Onboard} />
+          <Stack.Screen name='Tasks for Notion' component={Onboard} />
           <Stack.Screen name="Auth" component={Auth} />
         </Stack.Navigator>
         </>

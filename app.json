@@ -1,10 +1,11 @@
 {
   "expo": {
+    "scheme": "tasksfornotion",
     "name": "Tasks for Notion",
     "slug": "tasksfornotion",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/favicon_1.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
