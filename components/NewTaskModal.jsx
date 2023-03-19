@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import React, { useState, useEffect } from "react";
+import { Keyboard, Dimensions, StyleSheet, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   useAnimatedStyle,
@@ -8,12 +8,15 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
+import NewTaskForm from "./NewTaskForm";
+
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
-const NewTaskModal = () => {
+const NewTaskModal = ({ toggle, setToggle }) => {
   const translateY = useSharedValue(0);
-  const context = useSharedValue({ y: 0 });
+  const [keyboardStatus, setKeyboardStatus] = useState(false);
 
+  const context = useSharedValue({ y: 0 });
   const gesture = Gesture.Pan()
     .onStart(() => {
       context.value = { y: translateY.value };
@@ -38,13 +41,42 @@ const NewTaskModal = () => {
   });
 
   useEffect(() => {
-    translateY.value = withSpring(-SCREEN_HEIGHT / 2, { damping: 50 });
+    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
+      setKeyboardStatus(true);
+    });
+    const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardStatus(false);
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
   }, []);
+
+  useEffect(() => {
+    if (toggle) {
+      translateY.value = withSpring(-SCREEN_HEIGHT / 2, { damping: 50 });
+    }
+    if (!toggle) {
+      translateY.value = withSpring(0, { damping: 50 });
+    }
+  }, [toggle]);
+
+  useEffect(() => {
+    if (toggle && keyboardStatus) {
+      translateY.value = withSpring(-SCREEN_HEIGHT + 175, { damping: 50 });
+    }
+    if (toggle && !keyboardStatus) {
+      translateY.value = withSpring(-SCREEN_HEIGHT / 2, { damping: 50 });
+    }
+  }, [keyboardStatus]);
 
   return (
     <GestureDetector gesture={gesture}>
       <Animated.View style={[styles.modal, rModalStyle]}>
         <View style={styles.line}></View>
+        {toggle && <NewTaskForm setToggle={setToggle} />}
       </Animated.View>
     </GestureDetector>
   );

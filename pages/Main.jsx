@@ -1,11 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Button,
-  ActivityIndicator,
-} from "react-native";
+import { StyleSheet, View, ActivityIndicator } from "react-native";
 import { FAB } from "@rneui/themed";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
@@ -17,6 +11,7 @@ const Main = ({ navigation }) => {
   const { initialQuery } = useContext(TasksContext);
 
   const [loading, setLoading] = useState(true);
+  const [toggle, setToggle] = useState(false);
 
   useEffect(() => {
     initialQuery();
@@ -36,8 +31,7 @@ const Main = ({ navigation }) => {
     <>
       {!loading ? (
         <GestureHandlerRootView style={{ height: "100%", width: "100%" }}>
-          <NewTaskModal />
-
+          <NewTaskModal toggle={toggle} setToggle={setToggle} />
           <TasksList />
           <FAB
             icon={{ name: "add", color: "white" }}
@@ -45,7 +39,7 @@ const Main = ({ navigation }) => {
             placement="right"
             style={styles.fab}
             title="New task"
-            onPress={() => navigation.navigate("New task")}
+            onPress={setToggle}
           />
           <FAB
             visible={false}
