@@ -1,6 +1,6 @@
 {
   "expo": {
-    "scheme": "tasksfornotion",
+    "scheme": "tfn",
     "name": "Tasks for Notion",
     "slug": "tasksfornotion",
     "version": "1.0.0",
@@ -27,6 +27,12 @@
     },
     "web": {
       "favicon": "./assets/favicon_1.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "0b6d502e-aeb5-4f4c-bd2c-db72b65efad6"
+      }
+    },
+    "owner": "francwithc"
   }
 }
