@@ -7,26 +7,50 @@ import {
   SafeAreaView,
   Image,
 } from "react-native";
-import * as Linking from "expo-linking";
-import * as WebBrowser from "expo-web-browser";
+import * as AuthSession from "expo-auth-session";
+import * as SecureStore from "expo-secure-store";
+
+const URL =
+  "https://api.notion.com/v1/oauth/authorize?client_id=95152411-2ae3-45e6-b498-8747e83b2cd2&response_type=code&owner=user&redirect_uri=https%3A%2F%2Fauth.expo.io%2F%40francwithc%2Ftasksfornotion";
+const CLIENT_ID = "95152411-2ae3-45e6-b498-8747e83b2cd2";
+const CLIENT_SECRET = "secret_FHUtlgURStFdGxLPXjT5ajB8pqLYfzITnOqKrIzb41R";
+
+const authFlow = async () => {
+  const firstRequest = await AuthSession.startAsync({
+    authUrl: URL,
+  }).then(async (res) => {
+    if (res?.type === "success") {
+      const auth = await fetch("https://api.notion.com/v1/oauth/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Basic ${CLIENT_ID}:${CLIENT_SECRET}`,
+        },
+        body: JSON.stringify({
+          grant_type: "authorization_code",
+          code: res.params.code,
+          redirect_uri: "https://auth.expo.io/@francwithc/tasksfornotion",
+        }),
+      });
+
+      SecureStore.setItemAsync("tfn_notion_user_token", auth.access_token);
+      console.log(JSON.stringify(auth));
+    } else {
+      console.log(
+        "Something went wrong with authentication flow :( Try again!"
+      );
+    }
+  });
+};
 
 const Onboard = ({ navigation }) => {
-  const redirectURI = Linking.useURL();
-  const URL =
-    "https://api.notion.com/v1/oauth/authorize?client_id=95152411-2ae3-45e6-b498-8747e83b2cd2&response_type=code&owner=user&redirect_uri=https%3A%2F%2F127.0.0.1%3A19000";
+  //const redirectURI = Linking.useURL();
   const [result, setResult] = useState(null);
   const [uriLocal, setUriLocal] = useState(undefined);
 
   const _handlePressButtonAsync = async () => {
-    let result = await WebBrowser.openBrowserAsync(URL);
-    setResult(result);
+    await authFlow();
   };
-
-  useEffect(() => {
-    Linking.getInitialURL().then((res) => {
-      setUriLocal(res);
-    });
-  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -34,7 +58,7 @@ const Onboard = ({ navigation }) => {
         style={styles.image}
         source={require("../assets/onboardpicture.png")}
       />
-      <Text style={styles.text}>Welcome to Tasks for Notion! {uriLocal}</Text>
+      <Text style={styles.text}>Welcome to Tasks for Notion!</Text>
       <Button
         title="Authenticate in Notion"
         onPress={() => _handlePressButtonAsync()}

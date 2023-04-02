@@ -1,11 +1,10 @@
 const { Client } = require("@notionhq/client");
-const { NOTION_TOKEN } = require("../secrets");
+const { NOTION_TOKEN } = require("../secrets") /*SecureStore.getItemAsync("tfn_notion_user_token")*/;
 const db_id = '8954e5ccb5ed466daeec75dd67146408';
 
-export const notion = new Client({
+const notion = new Client({
     auth: NOTION_TOKEN,
 });
-
 
 export const getContentDatabase = async () => {
     const databaseId = db_id;

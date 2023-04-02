@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import * as SecureStore from 'expo-secure-store';
 
 import Main from './pages/Main';
 import Auth from './pages/Auth';
@@ -15,12 +16,11 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [token, setToken] = useState(null);
-  
 
   return (
     <NavigationContainer>
       {
-        token === null ?
+        token !== null ?
         <>
         <StatusBar backgroundColor="#ffffff" barStyle={'dark-content'}/>
         <Stack.Navigator>
