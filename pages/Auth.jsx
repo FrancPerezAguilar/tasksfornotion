@@ -1,43 +1,104 @@
-import React, { useState } from "react";
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, Button } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import * as Linking from "expo-linking";
-import * as WebBrowser from "expo-web-browser";
+import React, { useState, useEffect } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  FlatList,
+} from "react-native";
+import { FAB } from "@rneui/themed";
+import * as SecureStore from "expo-secure-store";
 
-const Auth = ({ setValue }) => {
-  const redirectURI = Linking.useURL();
-  const URL =
-    "https://api.notion.com/v1/oauth/authorize?client_id=95152411-2ae3-45e6-b498-8747e83b2cd2&response_type=code&owner=user&redirect_uri=https%3A%2F%2F127.0.0.1%3A19000";
-  const [result, setResult] = useState(null);
+import { getDatabasesList } from "../apis/notion";
 
-  const _handlePressButtonAsync = async () => {
-    let result = await WebBrowser.openBrowserAsync(URL);
-    setResult(result);
+const Item = ({ item, onPress, backgroundColor, textColor }) => (
+  <TouchableOpacity
+    onPress={onPress}
+    style={[styles.item, { backgroundColor }]}
+  >
+    <Text style={[styles.title, { color: textColor }]}>
+      {item.title[0]?.plain_text}
+    </Text>
+  </TouchableOpacity>
+);
+
+const Auth = ({ state, authorise }) => {
+  const [dblist, setDBlist] = useState(undefined);
+  const [selectedId, setSelectedId] = useState(undefined);
+
+  const selectDatabaseForUse = (db_id) => {
+    SecureStore.setItemAsync("tfn_database_selected_id", db_id);
+    authorise;
+  };
+
+  useEffect(() => {
+    getDatabasesList().then((res) => setDBlist(res));
+  }, []);
+
+  //useEffect(() => {}, [selectedId]);
+
+  const renderItem = ({ item }) => {
+    const backgroundColor = item.id === selectedId ? "#c2c2c2" : "#e2e2e2";
+    const color = item.id === selectedId ? "black" : "black";
+
+    return (
+      <Item
+        item={item}
+        onPress={() => setSelectedId(item.id)}
+        backgroundColor={backgroundColor}
+        textColor={color}
+      />
+    );
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.text}>First step!</Text>
-      <Button
-        title="Authenticate in Notion"
+    <View style={styles.container}>
+      <Text style={styles.text}>Select a database to use it as task list.</Text>
+      <FlatList
+        data={dblist}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        extraData={selectedId}
+        style={styles.flatlist}
+      />
+      <FAB
+        visible={selectedId !== undefined}
+        //icon={{ name: "arrow_forward", type: "material", color: "white" }}
+        color="#2383E2"
+        placement="right"
+        style={styles.fab}
+        title="Select database"
         onPress={() => {
-          _handlePressButtonAsync();
+          selectDatabaseForUse(selectedId);
         }}
       />
-      <Text>{result && JSON.stringify(result)}</Text>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     height: "100%",
-    display: "flex",
     alignItems: "center",
     justifyContent: "center",
   },
-  text: { width: "80%", fontSize: 20, marginBottom: 25, textAlign: "center" },
+  text: { width: "80%", fontSize: 20, marginVertical: 15, textAlign: "center" },
+  flatlist: {
+    width: "100%",
+    marginBottom: "10%",
+  },
+  item: {
+    padding: 20,
+    marginVertical: 2,
+    marginHorizontal: 2,
+    borderRadius: "10%",
+  },
+  title: {
+    fontSize: 20,
+  },
+  fab: {
+    marginBottom: "10%",
+  },
 });
 
 export default Auth;

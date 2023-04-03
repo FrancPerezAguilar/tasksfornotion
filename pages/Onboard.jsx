@@ -10,10 +10,7 @@ import {
 import * as AuthSession from "expo-auth-session";
 import * as SecureStore from "expo-secure-store";
 
-const URL =
-  "https://api.notion.com/v1/oauth/authorize?client_id=95152411-2ae3-45e6-b498-8747e83b2cd2&response_type=code&owner=user&redirect_uri=https%3A%2F%2Fauth.expo.io%2F%40francwithc%2Ftasksfornotion";
-const CLIENT_ID = "95152411-2ae3-45e6-b498-8747e83b2cd2";
-const CLIENT_SECRET = "secret_FHUtlgURStFdGxLPXjT5ajB8pqLYfzITnOqKrIzb41R";
+import { URL, CLIENT_ID, CLIENT_SECRET } from "../secrets";
 
 const authFlow = async () => {
   const firstRequest = await AuthSession.startAsync({
@@ -49,7 +46,9 @@ const Onboard = ({ navigation }) => {
   const [uriLocal, setUriLocal] = useState(undefined);
 
   const _handlePressButtonAsync = async () => {
-    await authFlow();
+    authFlow().then((res) => {
+      navigation.navigate("Select database");
+    });
   };
 
   return (

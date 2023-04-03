@@ -15,6 +15,7 @@ const TasksState = (props) => {
   const initialState = {
     taskList: [],
     database: {},
+    authorised: false,
   };
 
   const [state, dispatch] = useReducer(TasksReducer, initialState);
@@ -77,6 +78,7 @@ const TasksState = (props) => {
       value={{
         taskList: state.taskList,
         database: state.database,
+        authorised: state.authorised,
         addTask,
         patchTask,
         initialQuery,
