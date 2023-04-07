@@ -1,6 +1,9 @@
+import React from "react";
+import * as SecureStore from "expo-secure-store";
+
 const { Client } = require("@notionhq/client");
-const { NOTION_TOKEN } = require("../secrets") /*SecureStore.getItemAsync("tfn_notion_user_token")*/;
-const db_id = '8954e5ccb5ed466daeec75dd67146408' /*SecureStore.getItemAsync("tfn_database_selected_id")*/;
+const { NOTION_TOKEN } = SecureStore.getItemAsync("tfn_notion_user_token") /*require("../secrets")*/;
+const db_id = SecureStore.getItemAsync("tfn_database_selected_id") /*'8954e5ccb5ed466daeec75dd67146408'*/;
 
 const notion = new Client({
     auth: NOTION_TOKEN,

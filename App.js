@@ -10,7 +10,7 @@ import Onboard from './pages/Onboard';
 import NewTask from './pages/NewTask';
 
 import TasksState from './contexts/TasksState';
-import { checkConnection } from './apis/notion';
+//import { checkConnection } from './apis/notion';
 
 const Stack = createNativeStackNavigator();
 
@@ -18,20 +18,18 @@ export default function App() {
   const [auth, setAuth] = useState(false);
 
   useEffect(()=>{
-   checkConnection().then( (res) => setAuth(res));
+   //checkConnection().then( (res) => setAuth(res));
   },[]);
-
-  useEffect(()=>{}, [auth]);
 
   return (
     <NavigationContainer>
       {
-        auth ?
+        !auth ?
         <>
         <StatusBar backgroundColor="#ffffff" barStyle={'dark-content'}/>
         <Stack.Navigator>
-          <Stack.Screen name='Tasks for Notion' component={Onboard} />
-          <Stack.Screen name='Select database' component={Auth} state={auth} authorise={setAuth} />
+          <Stack.Screen name='Onboard' options={{ title: 'Tasks for Notion' }} component={Onboard} />
+          <Stack.Screen name='Select database' options={{ title: 'Select database' }} component={Auth} />
         </Stack.Navigator>
         </>
         :
@@ -40,10 +38,7 @@ export default function App() {
         <TasksState>
           <Stack.Navigator>
             <Stack.Group>
-              <Stack.Screen name="Tasks for Notion" component={Main} />
-            </Stack.Group>
-            <Stack.Group screenOptions={{ presentation: 'modal' }}>
-              <Stack.Screen name="New task" component={NewTask} />
+              <Stack.Screen name="Main" options={{ title: 'Tasks for Notion' }} component={Main} />
             </Stack.Group>
           </Stack.Navigator>
         </TasksState>

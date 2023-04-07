@@ -12,7 +12,7 @@ import * as SecureStore from "expo-secure-store";
 
 import { URL, CLIENT_ID, CLIENT_SECRET } from "../secrets";
 
-const authFlow = async () => {
+const authFlow = async (navigation) => {
   const firstRequest = await AuthSession.startAsync({
     authUrl: URL,
   }).then(async (res) => {
@@ -20,22 +20,29 @@ const authFlow = async () => {
       const auth = await fetch("https://api.notion.com/v1/oauth/token", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Basic ${CLIENT_ID}:${CLIENT_SECRET}`,
         },
-        body: JSON.stringify({
+        body: {
           grant_type: "authorization_code",
-          code: res.params.code,
+          code: `${res.params.code}`,
           redirect_uri: "https://auth.expo.io/@francwithc/tasksfornotion",
-        }),
+        },
+      }).then((res) => {
+        if (res?.ok === false) {
+          console.log(
+            "Something went wrong with authentication flow :( Try again!"
+          );
+          navigation.navigate("Onboard");
+        } else {
+          SecureStore.setItemAsync("tfn_notion_user_token", auth.access_token);
+          console.log(JSON.stringify(auth));
+        }
       });
-
-      SecureStore.setItemAsync("tfn_notion_user_token", auth.access_token);
-      console.log(JSON.stringify(auth));
     } else {
       console.log(
         "Something went wrong with authentication flow :( Try again!"
       );
+      navigation.navigate("Onboard");
     }
   });
 };
@@ -46,7 +53,8 @@ const Onboard = ({ navigation }) => {
   const [uriLocal, setUriLocal] = useState(undefined);
 
   const _handlePressButtonAsync = async () => {
-    authFlow().then((res) => {
+    authFlow(navigation).then((res) => {
+      console.log(res);
       navigation.navigate("Select database");
     });
   };

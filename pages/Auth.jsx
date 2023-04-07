@@ -22,13 +22,13 @@ const Item = ({ item, onPress, backgroundColor, textColor }) => (
   </TouchableOpacity>
 );
 
-const Auth = ({ state, authorise }) => {
+const Auth = () => {
   const [dblist, setDBlist] = useState(undefined);
   const [selectedId, setSelectedId] = useState(undefined);
 
   const selectDatabaseForUse = (db_id) => {
     SecureStore.setItemAsync("tfn_database_selected_id", db_id);
-    authorise;
+    //handleChange();
   };
 
   useEffect(() => {
